@@ -1,0 +1,51 @@
+version: '3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./tmp/db:/tmp/mysql
+    environment:
+      MYSQL_HOST: db
+      MYSQL_ROOT_PASSWORD: root
+    expose:
+      - "3306"
+
+  redis:
+    image: redis
+    restart: always
+    environment:
+      REDIS_HOST: redis
+    expose:
+      - "6379"
+
+  elasticsearch:
+    image: elasticsearch:6.8.4
+    restart: always
+    environment:
+      ELASTICSEARCH_HOST: elasticsearch
+      ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+    expose:
+      - "9200"
+
+  chat-api:
+    build: ./chat-api
+    restart: always
+    depends_on:
+      - "db"
+      - "redis"
+      - "elasticsearch"
+    volumes:
+      - ".:/chat-api"
+    ports:
+      - "3000:3000"
+
+  go-chat-creation-api:
+    build: ./go-chat-creation-api
+    restart: always
+    depends_on:
+      - "redis"
+    volumes:
+      - ".:/go-chat-creation-api"
+    ports:
+      - "8080:8080"

@@ -1,0 +1,8 @@
+:queues:
+  - chat
+  - message
+  - index
+
+:schedule:
+  RefreshIndexesWorker:
+    every: '120s'
